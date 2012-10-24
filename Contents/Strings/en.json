@@ -1,4 +1,8 @@
 {
     'Title': 'DR TV',
-    'Most Popular Menu Title': 'Most Popular'
+    'Most Viewed Menu Title': 'Most Viewed',
+    'Spot Menu Title': 'Spot',
+    'Newest Menu Title': 'Newest',
+    'Highlight Menu Title': 'Highlight',
+    'Last Chance Menu Title': 'Last Chance'
 }
