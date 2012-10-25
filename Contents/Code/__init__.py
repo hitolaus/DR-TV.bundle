@@ -112,3 +112,4 @@ def GetVideoClip(item):
                 summary = item['formattedBroadcastTime'],
                 thumb = Resource.ContentsOfURLWithFallback(thumb,'icon-default.png'),
                 url = url)
+    

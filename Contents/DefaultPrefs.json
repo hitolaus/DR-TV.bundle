@@ -1,0 +1,9 @@
+[
+ 	{
+        "id": "quality",
+        "type": "enum",
+        "label": "Quality",
+        "values": [ "high", "medium", "low" ],
+        "default": "medium"
+    }
+]

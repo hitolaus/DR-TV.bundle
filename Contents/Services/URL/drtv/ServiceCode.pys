@@ -25,23 +25,44 @@ def MetadataObjectForURL(url):
 def MediaObjectsForURL(url):
     return [
       MediaObject(
-                  parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url = url)))],
+                  parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url = url, quality = 'high')))],
                   #parts = [PartObject(key=Callback(PlayVideo, url = url))],
                   container = Container.MP4,
                   video_codec = VideoCodec.H264,
                   audio_codec = AudioCodec.AAC,
                   optimized_for_streaming = True,
+                  video_resolution = "High",
+                  audio_channels = 2
+      ),
+      MediaObject(
+                  parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url = url, quality = 'medium')))],
+                  #parts = [PartObject(key=Callback(PlayVideo, url = url))],
+                  container = Container.MP4,
+                  video_codec = VideoCodec.H264,
+                  audio_codec = AudioCodec.AAC,
+                  optimized_for_streaming = True,
+                  video_resolution = "Medium",
+                  audio_channels = 2
+      ),
+      MediaObject(
+                  parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url = url, quality = 'low')))],
+                  #parts = [PartObject(key=Callback(PlayVideo, url = url))],
+                  container = Container.MP4,
+                  video_codec = VideoCodec.H264,
+                  audio_codec = AudioCodec.AAC,
+                  optimized_for_streaming = True,
+                  video_resolution = "Low",
                   audio_channels = 2
       )
     ]
 
-def PlayVideo(url):
+def PlayVideo(url, quality):
     try:
         item = JSON.ObjectFromURL(url)
     except:
         return None
     
-    url = item['streams']['high']
+    url = item['streams'][quality]
     
     Log(url)
     
