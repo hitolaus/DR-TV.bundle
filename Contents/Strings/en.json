@@ -1,8 +1,10 @@
 {
-    'Title': 'DR TV',
-    'Most Viewed Menu Title': 'Most Viewed',
-    'Spot Menu Title': 'Spot',
-    'Newest Menu Title': 'Newest',
-    'Highlight Menu Title': 'Highlight',
-    'Last Chance Menu Title': 'Last Chance'
+    "Title": "DR TV",
+    "Most Viewed Menu Title": "Most Viewed",
+    "Spot Menu Title": "Spot",
+    "Newest Menu Title": "Newest",
+    "Highlight Menu Title": "Highlight",
+    "Last Chance Menu Title": "Last Chance",
+    "Premiere Menu Title": "Premiere",
+    "A-Z Menu Title": "A-Z"
 }
