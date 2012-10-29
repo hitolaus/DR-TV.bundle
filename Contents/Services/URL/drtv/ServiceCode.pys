@@ -71,16 +71,21 @@ def PlayVideo(url, quality):
     return new_playlist
 
 def RegeneratePlaylist(playlist, url):
-    new_playlist = ''
-    for line in playlist:
-        if not line.startswith('http') and not line.startswith('#'):
-            new_playlist = new_playlist + url + '/' + line
-        else:
-            new_playlist = new_playlist + line
+    rebuild_playlist = Client.Platform == ClientPlatform.Roku or Client.Platform or ClientPlatform.MacOSX or Client.Platform == ClientPlatform.Linux or Client.Platform == ClientPlatform.Windows
+                           
+    if rebuild_playlist:
+        new_playlist = ''
+        for line in playlist:
+            if not line.startswith('http') and not line.startswith('#'):
+                new_playlist = new_playlist + url + '/' + line
+            else:
+                new_playlist = new_playlist + line
     
-        new_playlist = new_playlist + '\n'
+            new_playlist = new_playlist + '\n'
 
-    return new_playlist
+        return new_playlist
+    else:
+        return Redirect(playlist)
      
 
 ####################################################################################################
