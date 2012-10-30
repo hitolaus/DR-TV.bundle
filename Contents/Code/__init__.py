@@ -42,7 +42,7 @@ def MainMenu():
     oc.add(DirectoryObject(key=Callback(MostViewedList), title=L('Most Viewed Menu Title'), thumb = R('icon-popular.png')))
 #    oc.add(DirectoryObject(key=Callback(HighlightList), title=L('Highlight Menu Title')))
     oc.add(DirectoryObject(key=Callback(PremiereList), title=L('Premiere Menu Title'), thumb = R('icon-tv.png')))
-    oc.add(DirectoryObject(key=Callback(NewestList), title=L('Newest Menu Title'), thumb = R('icon-flagged.png')))
+    oc.add(DirectoryObject(key=Callback(NewestList), title=L('Newest Menu Title'), thumb = R('icon-flaged.png')))
     oc.add(DirectoryObject(key=Callback(LastChanceList), title=L('Last Chance Menu Title'), thumb = R('icon-last.png')))
     oc.add(DirectoryObject(key=Callback(AlphabeticallyList), title=L('A-Z Menu Title'), thumb = R('icon-menu.png')))
     
