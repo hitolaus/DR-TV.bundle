@@ -26,32 +26,26 @@ def MediaObjectsForURL(url):
     return [
       MediaObject(
                   parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url = url, quality = 'high')))],
-                  #parts = [PartObject(key=Callback(PlayVideo, url = url))],
                   container = Container.MP4,
                   video_codec = VideoCodec.H264,
                   audio_codec = AudioCodec.AAC,
                   optimized_for_streaming = True,
-                  video_resolution = "High",
                   audio_channels = 2
       ),
       MediaObject(
                   parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url = url, quality = 'medium')))],
-                  #parts = [PartObject(key=Callback(PlayVideo, url = url))],
                   container = Container.MP4,
                   video_codec = VideoCodec.H264,
                   audio_codec = AudioCodec.AAC,
                   optimized_for_streaming = True,
-                  video_resolution = "Medium",
                   audio_channels = 2
       ),
       MediaObject(
                   parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url = url, quality = 'low')))],
-                  #parts = [PartObject(key=Callback(PlayVideo, url = url))],
                   container = Container.MP4,
                   video_codec = VideoCodec.H264,
                   audio_codec = AudioCodec.AAC,
                   optimized_for_streaming = True,
-                  video_resolution = "Low",
                   audio_channels = 2
       )
     ]
@@ -77,16 +71,21 @@ def PlayVideo(url, quality):
     return new_playlist
 
 def RegeneratePlaylist(playlist, url):
-    new_playlist = ''
-    for line in playlist:
-        if not line.startswith('http') and not line.startswith('#'):
-            new_playlist = new_playlist + url + '/' + line
-        else:
-            new_playlist = new_playlist + line
+    rebuild_playlist = Client.Platform == ClientPlatform.Roku or Client.Platform or ClientPlatform.MacOSX or Client.Platform == ClientPlatform.Linux or Client.Platform == ClientPlatform.Windows
+                           
+    if rebuild_playlist:
+        new_playlist = ''
+        for line in playlist:
+            if not line.startswith('http') and not line.startswith('#'):
+                new_playlist = new_playlist + url + '/' + line
+            else:
+                new_playlist = new_playlist + line
     
-        new_playlist = new_playlist + '\n'
+            new_playlist = new_playlist + '\n'
 
-    return new_playlist
+        return new_playlist
+    else:
+        return Redirect(playlist)
      
 
 ####################################################################################################
