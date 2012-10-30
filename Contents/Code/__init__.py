@@ -39,12 +39,12 @@ def MainMenu():
     oc = ObjectContainer()
 
     # TODO: Live channels
-    oc.add(DirectoryObject(key=Callback(MostViewedList), title=L('Most Viewed Menu Title')))
+    oc.add(DirectoryObject(key=Callback(MostViewedList), title=L('Most Viewed Menu Title'), thumb = R('icon-popular.png')))
 #    oc.add(DirectoryObject(key=Callback(HighlightList), title=L('Highlight Menu Title')))
-    oc.add(DirectoryObject(key=Callback(PremiereList), title=L('Premiere Menu Title')))
-    oc.add(DirectoryObject(key=Callback(NewestList), title=L('Newest Menu Title')))
-    oc.add(DirectoryObject(key=Callback(LastChanceList), title=L('Last Chance Menu Title')))
-    oc.add(DirectoryObject(key=Callback(AlphabeticallyList), title=L('A-Z Menu Title')))
+    oc.add(DirectoryObject(key=Callback(PremiereList), title=L('Premiere Menu Title'), thumb = R('icon-tv.png')))
+    oc.add(DirectoryObject(key=Callback(NewestList), title=L('Newest Menu Title'), thumb = R('icon-flagged.png')))
+    oc.add(DirectoryObject(key=Callback(LastChanceList), title=L('Last Chance Menu Title'), thumb = R('icon-last.png')))
+    oc.add(DirectoryObject(key=Callback(AlphabeticallyList), title=L('A-Z Menu Title'), thumb = R('icon-menu.png')))
     
     return oc
     
@@ -110,6 +110,6 @@ def GetVideoClip(item):
     return VideoClipObject(
                 title = item['title'],
                 summary = item['formattedBroadcastTime'],
-                thumb = Resource.ContentsOfURLWithFallback(thumb,'icon-default.png'),
+                thumb = Resource.ContentsOfURLWithFallback(thumb,R('icon-movie.png')),
                 url = url)
     
