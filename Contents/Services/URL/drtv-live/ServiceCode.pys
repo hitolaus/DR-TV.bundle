@@ -1,0 +1,46 @@
+####################################################################################################
+def MetadataObjectForURL(url):
+
+    return VideoClipObject(
+        title = 'title',
+        summary = 'description',
+        thumb = R('icon-default.png'))
+
+####################################################################################################
+def MediaObjectsForURL(url):
+    return [
+      MediaObject(
+                  parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url = url)))],
+                  container = Container.MP4,
+                  video_codec = VideoCodec.H264,
+                  audio_codec = AudioCodec.AAC,
+                  optimized_for_streaming = True,
+                  audio_channels = 2
+      )
+    ]
+
+def PlayVideo(url):    
+    original_playlist = HTTP.Request(url).content
+    
+    url = url[:url.rindex("/")]
+
+    new_playlist = RegeneratePlaylist(original_playlist.splitlines(), url)
+
+    return new_playlist
+
+def RegeneratePlaylist(playlist, url):
+    new_playlist = ''
+    for line in playlist:
+        if not line.startswith('http') and not line.startswith('#'):
+            new_playlist = new_playlist + url + '/' + line
+        else:
+            new_playlist = new_playlist + line
+    
+        new_playlist = new_playlist + '\n'
+
+    return new_playlist
+
+
+####################################################################################################
+def NormalizeURL(url):
+    return url

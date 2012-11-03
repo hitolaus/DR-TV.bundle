@@ -13,6 +13,8 @@ PLATFORM='ipad'
 API_MOBILE_BASE_URL = 'http://www.dr.dk/nu-mobil/api'
 API_BASE_URL = 'http://www.dr.dk/nu/api'
 
+LIVE_URL_BASE = 'http://lm.gss.dr.dk/V/V%sH.stream/Playlist.m3u8'
+
 THUMB_WIDTH = '300'
 THUMB_HEIGHT = '120'
 
@@ -38,14 +40,48 @@ def MainMenu():
 
     oc = ObjectContainer()
 
-    # TODO: Live channels
+    oc.add(DirectoryObject(key=Callback(LiveTvList), title=L('Live TV Menu Title'), thumb = R('icon-tv.png')))
     oc.add(DirectoryObject(key=Callback(MostViewedList), title=L('Most Viewed Menu Title'), thumb = R('icon-popular.png')))
-#    oc.add(DirectoryObject(key=Callback(HighlightList), title=L('Highlight Menu Title')))
-    oc.add(DirectoryObject(key=Callback(PremiereList), title=L('Premiere Menu Title'), thumb = R('icon-tv.png')))
+    oc.add(DirectoryObject(key=Callback(PremiereList), title=L('Premiere Menu Title'), thumb = R('icon-bookmark.png')))
     oc.add(DirectoryObject(key=Callback(NewestList), title=L('Newest Menu Title'), thumb = R('icon-flaged.png')))
     oc.add(DirectoryObject(key=Callback(LastChanceList), title=L('Last Chance Menu Title'), thumb = R('icon-last.png')))
     oc.add(DirectoryObject(key=Callback(AlphabeticallyList), title=L('A-Z Menu Title'), thumb = R('icon-menu.png')))
     
+    return oc
+    
+def LiveTvList():
+    oc = ObjectContainer()
+    
+    oc.add(VideoClipObject(
+                    url = LIVE_URL_BASE % '01',
+                    title = "DR1",
+                    summary = "",
+                    thumb = R('icon-channel-dr1.png')))
+    oc.add(VideoClipObject(
+                    url = LIVE_URL_BASE % '02',
+                    title = "DR2",
+                    summary = "",
+                    thumb = R('icon-channel-dr2.png')))
+    oc.add(VideoClipObject(
+                    url = LIVE_URL_BASE % '06',
+                    title = "DR HD",
+                    summary = "",
+                    thumb = R('icon-channel-drhd.png')))
+    oc.add(VideoClipObject(
+                    url = LIVE_URL_BASE % '05',
+                    title = "DR Ramasjang",
+                    summary = "",
+                    thumb = R('icon-channel-ramasjang.png')))
+    oc.add(VideoClipObject(
+                    url = LIVE_URL_BASE % '04',
+                    title = "DR K",
+                    summary = "",
+                    thumb = R('icon-channel-drk.png')))
+    oc.add(VideoClipObject(
+                    url = LIVE_URL_BASE % '03',
+                    title = "DR Update",
+                    summary = "",
+                    thumb = R('icon-channel-update.png')))
     return oc
     
 def MostViewedList():
@@ -104,8 +140,6 @@ def GetVideoClip(item):
     #thumb = API_BASE_URL+'/programseries/'+item['programSerieSlug']+'/images/'+THUMB_WIDTH+'x'+THUMB_HEIGHT+'.jpg'
     thumb = 'http://www.dr.dk/nu-mobil/nuapi/videos/'+item['id']+'/images/'+THUMB_WIDTH+'x'+THUMB_HEIGHT+'.jpg'
     url = API_MOBILE_BASE_URL+'/videos/'+item['id']+'?platform='+PLATFORM
-    
-    Log(thumb)
     
     return VideoClipObject(
                 title = item['title'],
