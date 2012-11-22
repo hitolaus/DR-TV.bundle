@@ -16,10 +16,10 @@ Tested to work on the following clients:
 - Mac
 - Windows
 - Roku 
+- iOS
 
 Does *NOT* work on the following clients:
 
-- iOS
 - LG MediaLink
 
 # Credits
