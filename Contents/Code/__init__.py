@@ -131,7 +131,7 @@ def GenresList():
     # http://www.dr.dk/nu-mobil/api/genres
 
     for genre in JSON.ObjectFromURL(API_MOBILE_BASE_URL+'/genres'):
-        url = 'http://www.dr.dk/tv/api/programmap?&searchType=startswith&title=&genre='+genre.get('name')+'&channelSlug=&includePreviews=true&orderByDate=true&limit=24&offset=0'
+        url = 'http://www.dr.dk/tv/api/programmap?&searchType=startswith&title=&genre='+genre.get('name')+'&channelSlug=&includePreviews=true&orderByDate=true&limit=50&offset=0'
 
         oc.add(DirectoryObject(key = Callback(BrowseGenre, url = url),
                                 title = genre.get('name', 'Unknown')))
