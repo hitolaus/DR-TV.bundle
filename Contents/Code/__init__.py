@@ -2,6 +2,7 @@
 # TODO:
 # -
 ####################################################################################################
+from dateutil import parser
 
 VIDEO_PREFIX = "/video/drtv"
 
@@ -12,6 +13,7 @@ PLATFORM='ipad'
 
 API_MOBILE_BASE_URL = 'http://www.dr.dk/nu-mobil/api'
 API_BASE_URL = 'http://www.dr.dk/nu/api'
+API_META_URL = 'http://www.dr.dk/mu/programcard'
 
 LIVE_URL_BASE = 'http://lm.gss.dr.dk/V/V%sH.stream/Playlist.m3u8'
 
@@ -45,45 +47,54 @@ def MainMenu():
     oc.add(DirectoryObject(key=Callback(PremiereList), title=L('Premiere Menu Title'), thumb = R('icon-bookmark.png')))
     oc.add(DirectoryObject(key=Callback(NewestList), title=L('Newest Menu Title'), thumb = R('icon-flaged.png')))
     oc.add(DirectoryObject(key=Callback(LastChanceList), title=L('Last Chance Menu Title'), thumb = R('icon-last.png')))
+    oc.add(DirectoryObject(key=Callback(GenresList), title=L('Genre Menu Title'), thumb = R('icon-starred.png')))
     oc.add(DirectoryObject(key=Callback(AlphabeticallyList), title=L('A-Z Menu Title'), thumb = R('icon-menu.png')))
-    
+
     return oc
-    
+
+
+def GetLiveProgramDescription(slug):
+    now = JSON.ObjectFromURL('http://www.dr.dk/TV/api/live/info/'+slug+'/json').get('Now')
+    if not now:
+        return ""
+
+    return now.get('Description', '')
+
 def LiveTvList():
     oc = ObjectContainer()
-    
+
     oc.add(VideoClipObject(
                     url = LIVE_URL_BASE % '01',
                     title = "DR1",
-                    summary = "",
+                    summary = GetLiveProgramDescription("dr1"),
                     thumb = R('icon-channel-dr1.png')))
     oc.add(VideoClipObject(
                     url = LIVE_URL_BASE % '02',
                     title = "DR2",
-                    summary = "",
+                    summary = GetLiveProgramDescription("dr2"),
                     thumb = R('icon-channel-dr2.png')))
     oc.add(VideoClipObject(
                     url = LIVE_URL_BASE % '06',
-                    title = "DR HD",
-                    summary = "",
+                    title = "DR 3",
+                    summary = GetLiveProgramDescription("dr3"),
                     thumb = R('icon-channel-drhd.png')))
     oc.add(VideoClipObject(
                     url = LIVE_URL_BASE % '05',
                     title = "DR Ramasjang",
-                    summary = "",
+                    summary = GetLiveProgramDescription("dr-ramasjang"),
                     thumb = R('icon-channel-ramasjang.png')))
     oc.add(VideoClipObject(
                     url = LIVE_URL_BASE % '04',
                     title = "DR K",
-                    summary = "",
+                    summary = GetLiveProgramDescription("dr-k"),
                     thumb = R('icon-channel-drk.png')))
     oc.add(VideoClipObject(
                     url = LIVE_URL_BASE % '03',
-                    title = "DR Update",
-                    summary = "",
+                    title = "DR Ultra",
+                    summary = GetLiveProgramDescription("dr-ultra"),
                     thumb = R('icon-channel-update.png')))
     return oc
-    
+
 def MostViewedList():
     return BrowseVideos(API_MOBILE_BASE_URL + '/mostviewed')
 
@@ -99,51 +110,99 @@ def LastChanceList():
 def PremiereList():
     return BrowseVideos(API_MOBILE_BASE_URL + '/premiere')
 
+def BrowseGenre(url):
+    oc = ObjectContainer()
+
+    for program in JSON.ObjectFromURL(url)['ProgramSeries']:
+        slug = program['ProgramSeriesSlug']
+
+        title = program['Title']
+        thumb = program['Image']
+        url = API_MOBILE_BASE_URL +'/programserie?slug='+ slug
+
+        oc.add(DirectoryObject(key = Callback(BrowseProgram, url = url),
+                            title = title,
+                            thumb = Resource.ContentsOfURLWithFallback(thumb,'icon-default.png')))
+
+    return oc
+
+def GenresList():
+    oc = ObjectContainer()
+    # http://www.dr.dk/nu-mobil/api/genres
+
+    for genre in JSON.ObjectFromURL(API_MOBILE_BASE_URL+'/genres'):
+        url = 'http://www.dr.dk/tv/api/programmap?&searchType=startswith&title=&genre='+genre.get('name')+'&channelSlug=&includePreviews=true&orderByDate=true&limit=24&offset=0'
+
+        oc.add(DirectoryObject(key = Callback(BrowseGenre, url = url),
+                                title = genre.get('name', 'Unknown')))
+
+    return oc
+
+
 def AlphabeticallyList():
     oc = ObjectContainer()
-    
+
     for item in HTML.ElementFromURL('http://www.dr.dk/nu-mobil/home/alphabetical').xpath('//li'):
         #http://www.dr.dk/nu-mobil/api/programserie?label=
         internal_link = item.xpath('.//a')[0].get('href')
-        
+
         slug = internal_link[internal_link.rindex("/")+1:]
-        
+
         thumb = API_BASE_URL+'/programseries/'+slug+'/images/'+THUMB_WIDTH+'x'+THUMB_HEIGHT+'.jpg'
         url = API_MOBILE_BASE_URL +'/programserie?slug='+ slug
 
         title = item.xpath('.//a/text()')[0]
-        
-        oc.add(DirectoryObject(key = Callback(BrowseProgram, url = url),
+
+        title_pattern = Regex('(.*)\(([0-9]+)\)')
+        m = title_pattern.search(title)
+        episode_count = int(m.group(2))
+
+        title = m.group(1).strip()
+
+#        oc.add(DirectoryObject(key = Callback(BrowseProgram, url = url),
+#                            title = title,
+#                            thumb = Resource.ContentsOfURLWithFallback(thumb,'icon-default.png')))
+        oc.add(TVShowObject(key = Callback(BrowseProgram, url = url),
+                            rating_key = slug,
                             title = title,
+                            episode_count = episode_count,
                             thumb = Resource.ContentsOfURLWithFallback(thumb,'icon-default.png')))
+
+
     return oc
 
 #####################################
 
 def BrowseProgram(url):
     oc = ObjectContainer()
-    
+
     for item in JSON.ObjectFromURL(url)['videos']:
         oc.add(GetVideoClip(item))
-        
+
     return oc
 
 def BrowseVideos(url):
     oc = ObjectContainer()
-    
+
     for item in JSON.ObjectFromURL(url):
         oc.add(GetVideoClip(item))
 
     return oc
 
+
 def GetVideoClip(item):
-    #thumb = API_BASE_URL+'/programseries/'+item['programSerieSlug']+'/images/'+THUMB_WIDTH+'x'+THUMB_HEIGHT+'.jpg'
     thumb = 'http://www.dr.dk/nu-mobil/nuapi/videos/'+item['id']+'/images/'+THUMB_WIDTH+'x'+THUMB_HEIGHT+'.jpg'
     url = API_MOBILE_BASE_URL+'/videos/'+item['id']+'?platform='+PLATFORM
-    
-    return VideoClipObject(
+
+    meta = JSON.ObjectFromURL(API_META_URL+'/'+item['id'])
+
+    description = meta['Data'][0]['Description']
+    aired = parser.parse(meta['Data'][0]['PrimaryBroadcastStartTime'])
+
+    return EpisodeObject(
                 title = item['title'],
-                summary = item['formattedBroadcastTime'],
+                summary = description,
+                originally_available_at = aired,
                 thumb = Resource.ContentsOfURLWithFallback(thumb,R('icon-movie.png')),
                 url = url)
-    
+

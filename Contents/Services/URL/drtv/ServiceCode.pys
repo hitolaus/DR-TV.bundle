@@ -55,13 +55,13 @@ def PlayVideo(url, quality):
         item = JSON.ObjectFromURL(url)
     except:
         return None
-    
+
     url = item['streams'][quality]
-    
+
     original_playlist = HTTP.Request(url).content
-    
+
     url = url[:url.rindex("/")]
-    
+
     new_playlist = RegeneratePlaylist(original_playlist.splitlines(), url)
 
     return new_playlist
@@ -73,11 +73,11 @@ def RegeneratePlaylist(playlist, url):
             new_playlist = new_playlist + url + '/' + line
         else:
             new_playlist = new_playlist + line
-    
+
         new_playlist = new_playlist + '\n'
 
     return new_playlist
-     
+
 
 ####################################################################################################
 def NormalizeURL(url):
