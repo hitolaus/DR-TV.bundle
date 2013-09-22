@@ -25,7 +25,7 @@ def MetadataObjectForURL(url):
 def MediaObjectsForURL(url):
     return [
       MediaObject(
-                  parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url = url, quality = 'high')))],
+                  parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url = url, quality = 'high', platform = Client.Platform)))],
                   container = Container.MP4,
                   video_codec = VideoCodec.H264,
                   audio_codec = AudioCodec.AAC,
@@ -33,7 +33,7 @@ def MediaObjectsForURL(url):
                   audio_channels = 2
       ),
       MediaObject(
-                  parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url = url, quality = 'medium')))],
+                  parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url = url, quality = 'medium', platform = Client.Platform)))],
                   container = Container.MP4,
                   video_codec = VideoCodec.H264,
                   audio_codec = AudioCodec.AAC,
@@ -41,7 +41,7 @@ def MediaObjectsForURL(url):
                   audio_channels = 2
       ),
       MediaObject(
-                  parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url = url, quality = 'low')))],
+                  parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url = url, quality = 'low', platform = Client.Platform)))],
                   container = Container.MP4,
                   video_codec = VideoCodec.H264,
                   audio_codec = AudioCodec.AAC,
@@ -50,7 +50,11 @@ def MediaObjectsForURL(url):
       )
     ]
 
-def PlayVideo(url, quality):
+##
+# For some reason Client.Platform doesn't work in here (maybe because it is an callback?) so
+# we pass the platform as parameter.
+##
+def PlayVideo(url, quality, platform):
     try:
         item = JSON.ObjectFromURL(url)
     except:
@@ -64,7 +68,10 @@ def PlayVideo(url, quality):
 
     new_playlist = RegeneratePlaylist(original_playlist.splitlines(), url)
 
-    return new_playlist
+    if platform == ClientPlatform.iOS:
+        return Redirect(item['streams'][quality])
+    else:
+        return new_playlist
 
 def RegeneratePlaylist(playlist, url):
     new_playlist = ''

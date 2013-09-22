@@ -10,7 +10,7 @@ def MetadataObjectForURL(url):
 def MediaObjectsForURL(url):
     return [
       MediaObject(
-                  parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url = url)))],
+                  parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url = url, platform = Client.Platform)))],
                   container = Container.MP4,
                   video_codec = VideoCodec.H264,
                   audio_codec = AudioCodec.AAC,
@@ -19,14 +19,19 @@ def MediaObjectsForURL(url):
       )
     ]
 
-def PlayVideo(url):    
+def PlayVideo(url, platform):
+    original_url = url
     original_playlist = HTTP.Request(url).content
     
     url = url[:url.rindex("/")]
 
     new_playlist = RegeneratePlaylist(original_playlist.splitlines(), url)
 
-    return new_playlist
+    if platform == ClientPlatform.iOS:
+        return Redirect(original_url)
+    else:
+        return new_playlist
+
 
 def RegeneratePlaylist(playlist, url):
     new_playlist = ''
