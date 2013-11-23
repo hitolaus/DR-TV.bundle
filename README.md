@@ -12,10 +12,10 @@ Plex plugin for http://dr.dk/TV that uses the iOS HLS streams instead of Flash. 
 
 Tested to work on the following clients:
 
-- Mac
-- Windows
+- PHT (Mac/Windows/Linux)
 - Roku
 - iOS
+- Plex/Web
 
 Does *NOT* work on the following clients:
 

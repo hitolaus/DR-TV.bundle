@@ -56,43 +56,50 @@ def MainMenu():
 def GetLiveProgramDescription(slug):
     now = JSON.ObjectFromURL('http://www.dr.dk/TV/api/live/info/'+slug+'/json').get('Now')
     if not now:
-        return ""
+        return {}
 
-    return now.get('Description', '')
+    return now
 
 def LiveTvList():
+    dr1 = GetLiveProgramDescription("dr1")
+    dr2 = GetLiveProgramDescription("dr2")
+    dr3 = GetLiveProgramDescription("dr3")
+    ramasjang = GetLiveProgramDescription("dr-ramasjang")
+    drk = GetLiveProgramDescription("dr-k")
+    ultra = GetLiveProgramDescription("dr-ultra")
+
     oc = ObjectContainer()
 
     oc.add(VideoClipObject(
                     url = LIVE_URL_BASE % '01',
-                    title = "DR1",
-                    summary = GetLiveProgramDescription("dr1"),
+                    title = dr1.get('Title', 'DR1'),
+                    summary = dr1.get('Description'),
                     thumb = R('icon-channel-dr1.png')))
     oc.add(VideoClipObject(
                     url = LIVE_URL_BASE % '02',
-                    title = "DR2",
-                    summary = GetLiveProgramDescription("dr2"),
+                    title = dr2.get('Title', 'DR2'),
+                    summary = dr2.get('Description'),
                     thumb = R('icon-channel-dr2.png')))
     oc.add(VideoClipObject(
                     url = LIVE_URL_BASE % '06',
-                    title = "DR 3",
-                    summary = GetLiveProgramDescription("dr3"),
-                    thumb = R('icon-channel-drhd.png')))
+                    title = dr3.get('Title', 'DR3'),
+                    summary = dr3.get('Description'),
+                    thumb = R('icon-channel-dr3.png')))
     oc.add(VideoClipObject(
                     url = LIVE_URL_BASE % '05',
-                    title = "DR Ramasjang",
-                    summary = GetLiveProgramDescription("dr-ramasjang"),
+                    title = ramasjang.get('Title', 'DR Ramasjang'),
+                    summary = ramasjang.get('Description'),
                     thumb = R('icon-channel-ramasjang.png')))
     oc.add(VideoClipObject(
                     url = LIVE_URL_BASE % '04',
-                    title = "DR K",
-                    summary = GetLiveProgramDescription("dr-k"),
+                    title = drk.get('Title', 'DR K'),
+                    summary = drk.get('Description'),
                     thumb = R('icon-channel-drk.png')))
     oc.add(VideoClipObject(
                     url = LIVE_URL_BASE % '03',
-                    title = "DR Ultra",
-                    summary = GetLiveProgramDescription("dr-ultra"),
-                    thumb = R('icon-channel-update.png')))
+                    title = ultra.get('Title', 'DR Ultra'),
+                    summary = ultra.get('Description'),
+                    thumb = R('icon-channel-ultra.png')))
     return oc
 
 def MostViewedList():
