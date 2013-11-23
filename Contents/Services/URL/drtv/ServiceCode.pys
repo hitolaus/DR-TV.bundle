@@ -32,7 +32,8 @@ def MediaObjectsForURL(url):
                   video_codec = VideoCodec.H264,
                   audio_codec = AudioCodec.AAC,
                   optimized_for_streaming = True,
-                  audio_channels = 2
+                  audio_channels = 2,
+                  video_resolution = '720'
       ),
       MediaObject(
                   parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url = url, quality = 'medium', platform = Client.Platform)))],
@@ -40,7 +41,8 @@ def MediaObjectsForURL(url):
                   video_codec = VideoCodec.H264,
                   audio_codec = AudioCodec.AAC,
                   optimized_for_streaming = True,
-                  audio_channels = 2
+                  audio_channels = 2,
+                  video_resolution = '480'
       ),
       MediaObject(
                   parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url = url, quality = 'low', platform = Client.Platform)))],
@@ -48,7 +50,8 @@ def MediaObjectsForURL(url):
                   video_codec = VideoCodec.H264,
                   audio_codec = AudioCodec.AAC,
                   optimized_for_streaming = True,
-                  audio_channels = 2
+                  audio_channels = 2,
+                  video_resolution = '360'
       )
     ]
 
