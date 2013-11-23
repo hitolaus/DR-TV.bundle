@@ -206,7 +206,7 @@ def GetVideoClip(item):
     description = meta['Data'][0]['Description']
     aired = parser.parse(meta['Data'][0]['PrimaryBroadcastStartTime'])
 
-    return EpisodeObject(
+    return VideoClipObject(
                 title = item['title'],
                 summary = description,
                 originally_available_at = aired,

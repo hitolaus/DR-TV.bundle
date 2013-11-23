@@ -14,7 +14,9 @@ def MetadataObjectForURL(url):
     # Extract the details available directly form the page.
     title = item['title']
     description = item['description']
-    thumb = API_BASE_URL+'programseries/'+item['programSerieSlug']+'/images/'+THUMB_WIDTH+'x'+THUMB_HEIGHT+'.jpg'
+    #thumb = API_BASE_URL+'programseries/'+item['programSerieSlug']+'/images/'+THUMB_WIDTH+'x'+THUMB_HEIGHT+'.jpg'
+
+    thumb = 'http://www.dr.dk/nu-mobil/nuapi/videos/'+item['id']+'/images/'+THUMB_WIDTH+'x'+THUMB_HEIGHT+'.jpg'
 
     return VideoClipObject(
         title = title,
