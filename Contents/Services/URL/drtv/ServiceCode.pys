@@ -1,33 +1,65 @@
+import time
+import datetime
+
 API_BASE_URL = 'http://www.dr.dk/nu/api'
 
+IMAGE_URI = 'http://asset.dr.dk/drdkimagescale/imagescale.drxml?server=www.dr.dk&w=%s&h=%s&file=/mu/programcard/imageuri/%s&scaleAfter=crop&contenttype=jpg'
+
 THUMB_WIDTH = '300'
-THUMB_HEIGHT = '150'
+THUMB_HEIGHT = '160'
 
 BANDWIDTH_PATTERN = Regex('#EXT.*BANDWIDTH=([0-9]+)')
 
+# {
+#    "productionNumber":"00580915240",
+#    "channelId":"dr-ultra",
+#    "genre":"",
+#    "slug":"pagten-24-24",
+#    "title":"Pagten (24:24)",
+#    "description":"Iselin venter på, at Lyda, Malte og Viji vil prøve at redde Rune - så er hun klar til at slå til. Men vil det lykkes børnene at få Pagten til at virke og redde Lyda og hendes familie - og skille sig af med Iselin for altid? Hvad med kammeratskabet i 6.B? Hvad med børnene og deres forældre? Og hvad med Helle og Jens?   \n",
+#    "duration":"00:23:55",
+#    "formattedBroadcastTime":"25. Dec. 2013",
+#    "broadcastChannel":"DR Ultra",
+#    "programSerieSlug":"pagten",
+#    "seriesVideoCount":20,
+#    "seriesTitle":"Pagten",
+#    "restrictedToDenmark":true,
+#    "chapters":[
+
+#    ],
+#    "streams":{
+#       "low":"http://drod03j-vh.akamaihd.net/i/all/clear/streaming/8f/5298934d6187a20b90e5e18f/Pagten--24-24-_115f0ae7f6aa49a2b41a4885147ac408_,1123,562,248,122,.mp4.csmil/master.m3u8",
+#       "medium":"http://drod03j-vh.akamaihd.net/i/all/clear/streaming/8f/5298934d6187a20b90e5e18f/Pagten--24-24-_115f0ae7f6aa49a2b41a4885147ac408_,1123,562,248,122,.mp4.csmil/master.m3u8",
+#       "high":"http://drod03j-vh.akamaihd.net/i/all/clear/streaming/8f/5298934d6187a20b90e5e18f/Pagten--24-24-_115f0ae7f6aa49a2b41a4885147ac408_,1123,562,248,122,.mp4.csmil/master.m3u8"
+#    }
+# }
 ####################################################################################################
 def MetadataObjectForURL(url):
-
     # Request the URL
     item = JSON.ObjectFromURL(url, cacheTime=7200)
 
     # Extract the details available directly form the page.
     title = item['title']
     description = item['description']
-    #thumb = API_BASE_URL+'programseries/'+item['programSerieSlug']+'/images/'+THUMB_WIDTH+'x'+THUMB_HEIGHT+'.jpg'
+    #thumb = 'http://www.dr.dk/nu-mobil/nuapi/videos/'+item['id']+'/images/'+THUMB_WIDTH+'x'+THUMB_HEIGHT+'.jpg'
+    thumb = IMAGE_URI % (THUMB_WIDTH, THUMB_HEIGHT, item['slug'])
+    art = IMAGE_URI % ('1280', '720', item['slug'])
 
-    thumb = 'http://www.dr.dk/nu-mobil/nuapi/videos/'+item['id']+'/images/'+THUMB_WIDTH+'x'+THUMB_HEIGHT+'.jpg'
+    t = time.strptime(item['duration'], '%H:%M:%S')
+    d = int(datetime.timedelta(hours=t.tm_hour,minutes=t.tm_min,seconds=t.tm_sec).total_seconds())
 
     return VideoClipObject(
         title = title,
         summary = description,
-        thumb = thumb)
+        thumb = thumb,
+        art = art,
+        duration = d*1000)
 
 ####################################################################################################
 def MediaObjectsForURL(url):
     return [
       MediaObject(
-                  parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url = url, quality = 'high', platform = Client.Platform)))],
+                  parts = [PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url = url, quality = 'high', platform=Client.Platform)))],
                   container = Container.MP4,
                   video_codec = VideoCodec.H264,
                   audio_codec = AudioCodec.AAC,
@@ -54,11 +86,19 @@ def MediaObjectsForURL(url):
                   video_resolution = '360'
       )
     ]
+# def MediaObjectsForURL(url):
+#     return [
+#       MediaObject(
+#                   parts=[PartObject(key=HTTPLiveStreamURL(Callback(PlayVideo, url=url, platform=Client.Platform)))]
+#       )
+#     ]
+
 
 ##
 # For some reason Client.Platform doesn't work in here (maybe because it is an callback?) so
 # we pass the platform as parameter.
 ##
+#@indirect
 def PlayVideo(url, quality, platform):
     try:
         item = JSON.ObjectFromURL(url)
@@ -77,6 +117,7 @@ def PlayVideo(url, quality, platform):
         return Redirect(item['streams'][quality])
     else:
         return new_playlist
+        #return IndirectResponse(VideoClipObject, key=item['streams'][quality])
 
 def RegeneratePlaylist(playlist, url):
     new_playlist = ''

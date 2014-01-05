@@ -1,6 +1,6 @@
 #
 # TODO:
-# -
+# - Search http://www.dr.dk/tv/api/programmap?&searchType=contains&title=bonder%C3%B8ven&genre=&channelSlug=&includePreviews=true&orderByDate=false&limit=24&offset=0
 ####################################################################################################
 from dateutil import parser
 
@@ -18,7 +18,7 @@ API_META_URL = 'http://www.dr.dk/mu/programcard'
 LIVE_URL_BASE = 'http://lm.gss.dr.dk/V/V%sH.stream/Playlist.m3u8'
 
 THUMB_WIDTH = '300'
-THUMB_HEIGHT = '120'
+THUMB_HEIGHT = '160'
 
 # This function is initially called by the PMS framework to initialize the plugin. This includes
 # setting up the Plugin static instance along with the displayed artwork.
@@ -149,6 +149,8 @@ def GenresList():
 def AlphabeticallyList():
     oc = ObjectContainer()
 
+    #Do a search - http://www.dr.dk/tv/api/programmap?&searchType=startswith&title=&genre=&channelSlug=&includePreviews=false&orderByDate=true&limit=24&offset=24
+
     for item in HTML.ElementFromURL('http://www.dr.dk/nu-mobil/home/alphabetical').xpath('//li'):
         #http://www.dr.dk/nu-mobil/api/programserie?label=
         internal_link = item.xpath('.//a')[0].get('href')
@@ -197,19 +199,182 @@ def BrowseVideos(url):
     return oc
 
 
+# {
+#   u'programSerieSlug': u'den-store-julebagedyst-2013',
+#   u'broadcastTime': u'2013-12-25T20:00:00+01:00',
+#   u'formattedBroadcastTime': u'25. Dec. 2013',
+#   u'id': u'den-store-julebagedyst-2013',
+#   u'title': u'Den store julebagedyst 2013'
+#}
 def GetVideoClip(item):
-    thumb = 'http://www.dr.dk/nu-mobil/nuapi/videos/'+item['id']+'/images/'+THUMB_WIDTH+'x'+THUMB_HEIGHT+'.jpg'
+
+    thumb = 'http://asset.dr.dk/drdkimagescale/imagescale.drxml?server=www.dr.dk&w='+THUMB_WIDTH+'&h='+THUMB_HEIGHT+'&file=/mu/programcard/imageuri/' + item['id'] + '&scaleAfter=crop&contenttype=jpg'
     url = API_MOBILE_BASE_URL+'/videos/'+item['id']+'?platform='+PLATFORM
 
     meta = JSON.ObjectFromURL(API_META_URL+'/'+item['id'])
+
+    # {
+    #   u'TotalSize': 1,
+    #   u'ResultSize': 1,
+    #   u'Data': [
+    #       {
+    #           u'SiteUrl': None,
+    #           u'Title': u'Dokumania: Pirate Bay indefra',
+    #           u'LastModified': u'2014-01-04T21:00:51.781Z',
+    #           u'ProductionNumber': u'00921280060',
+    #           u'Site': u'radio-tv',
+    #           u'Broadcasts': [
+    #               {
+    #                   u'ProductionCountry': u'DANMARK',
+    #                   u'TransmissionOid': 195094417812,
+    #                   u'Description': u'Det er dagen f\xf8r retssagen begynder. Fredrik pakker en computer i en rusten gammel Volvo. Sammen med hans Pirate Bay-medstiftere st\xe5r han ansigt til ansigt med et erstatningskrav fra Hollywood p\xe5 72 millioner kroner i en sag om kr\xe6nkelse af ophavsret. Fredrik er p\xe5 vej hen for at installere en ny computer i den hemmelige serverhal. Det er her verdens st\xf8rste fildelingsside er gemt. \nDa hacker-vidunderbarnet Gottfrid, internetaktivisten Peter og den fordrukne webn\xf8rd Fredrik findes skyldige i retssagen bliver de konfronteret med virkeligheden i form af et liv offline - v\xe6k fra tastaturet. Men dybt nede i de m\xf8rke datacentre forts\xe6tter skjulte computere stille med at kopiere filer.',
+    #                   u'Title': u'Dokumania: Pirate Bay indefra',
+    #                   u'AnnouncedEndTime': u'2013-02-26T21:30:00Z',
+    #                   u'FirstPartOid': 195094418813,
+    #                   u'Key': u'dr.dk/mas/whatson/195094418813@dr.dk/mas/whatson/channel/DR2',
+    #                   u'BroadcastDate': u'2013-02-26T00:00:00Z',
+    #                   u'ProductionYear': 2012,
+    #                   u'StartTime': u'2013-02-26T19:59:13.32Z',
+    #                   u'VideoWidescreen': True,
+    #                   u'AnnouncedStartTime': u'2013-02-26T20:00:00Z',
+    #                   u'WhatsOnUri': u'dr.dk/mas/whatson/195094418813',
+    #                   u'EndTime': u'2013-02-26T21:29:55Z',
+    #                   u'IsRerun': False,
+    #                   u'Channel': u'dr.dk/mas/whatson/channel/DR2',
+    #                   u'Punchline': u'Dansk dokumentar fra 2013.'
+    #               },
+    #               {
+    #                   u'ProductionCountry': u'DANMARK',
+    #                   u'TransmissionOid': 199189366812,
+    #                   u'Description': u'Det er dagen f\xf8r retssagen begynder. Fredrik pakker en computer i en rusten gammel Volvo. Sammen med hans Pirate Bay-medstiftere st\xe5r han ansigt til ansigt med et erstatningskrav fra Hollywood p\xe5 72 millioner kroner i en sag om kr\xe6nkelse af ophavsret. Fredrik er p\xe5 vej hen for at installere en ny computer i den hemmelige serverhal. Det er her verdens st\xf8rste fildelingsside er gemt. \nDa hacker-vidunderbarnet Gottfrid, internetaktivisten Peter og den fordrukne webn\xf8rd Fredrik findes skyldige i retssagen bliver de konfronteret med virkeligheden i form af et liv offline - v\xe6k fra tastaturet. Men dybt nede i de m\xf8rke datacentre forts\xe6tter skjulte computere stille med at kopiere filer.',
+    #                   u'Title': u'DR3 Dok: Pirate Bay indefra',
+    #                   u'AnnouncedEndTime': u'2013-03-25T20:25:00Z',
+    #                   u'FirstPartOid': 199189367813,
+    #                   u'Key': u'dr.dk/mas/whatson/199189367813@dr.dk/mas/whatson/channel/DR3',
+    #                   u'BroadcastDate': u'2013-03-25T00:00:00Z',
+    #                   u'VideoHD': True,
+    #                   u'ProductionYear': 2012,
+    #                   u'StartTime': u'2013-03-25T18:58:38.24Z',
+    #                   u'VideoWidescreen': True,
+    #                   u'AnnouncedStartTime': u'2013-03-25T19:00:00Z',
+    #                   u'WhatsOnUri': u'dr.dk/mas/whatson/199189367813',
+    #                   u'EndTime': u'2013-03-25T20:22:58.64Z',
+    #                   u'IsRerun': False,
+    #                   u'Channel': u'dr.dk/mas/whatson/channel/DR3',
+    #                   u'Punchline': u'Dansk dokumentar fra 2013.'
+    #               },
+    #               {
+    #                   u'ProductionCountry': u'DANMARK',
+    #                   u'TransmissionOid': 193370133812,
+    #                   u'Description': u'Det er dagen f\xf8r retssagen begynder. Fredrik pakker en computer i en rusten gammel Volvo. Sammen med hans Pirate Bay-medstiftere st\xe5r han ansigt til ansigt med et erstatningskrav fra Hollywood p\xe5 72 millioner kroner i en sag om kr\xe6nkelse af ophavsret. Fredrik er p\xe5 vej hen for at installere en ny computer i den hemmelige serverhal. Det er her verdens st\xf8rste fildelingsside er gemt. \nDa hacker-vidunderbarnet Gottfrid, internetaktivisten Peter og den fordrukne webn\xf8rd Fredrik findes skyldige i retssagen bliver de konfronteret med virkeligheden i form af et liv offline - v\xe6k fra tastaturet. Men dybt nede i de m\xf8rke datacentre forts\xe6tter skjulte computere stille med at kopiere filer.',
+    #                   u'Title': u'DR3 Dok: Pirate Bay indefra',
+    #                   u'AnnouncedEndTime': u'2013-03-30T14:00:00Z',
+    #                   u'FirstPartOid': 193370134813,
+    #                   u'Key': u'dr.dk/mas/whatson/193370134813@dr.dk/mas/whatson/channel/DR3',
+    #                   u'BroadcastDate': u'2013-03-30T00:00:00Z',
+    #                   u'VideoHD': True, u'ProductionYear': 2012,
+    #                   u'StartTime': u'2013-03-30T12:37:08Z',
+    #                   u'VideoWidescreen': True,
+    #                   u'AnnouncedStartTime': u'2013-03-30T12:35:00Z',
+    #                   u'WhatsOnUri': u'dr.dk/mas/whatson/193370134813',
+    #                   u'EndTime': u'2013-03-30T14:00:06.76Z',
+    #                   u'IsRerun': False,
+    #                   u'Channel': u'dr.dk/mas/whatson/channel/DR3',
+    #                   u'Punchline': u'Dansk dokumentar fra 2013.'
+    #               },
+    #               {
+    #                   u'ProductionCountry': u'DANMARK',
+    #                   u'TransmissionOid': 201217098812,
+    #                   u'Description': u'Det er dagen f\xf8r retssagen begynder. Fredrik pakker en computer i en rusten gammel Volvo. Sammen med hans Pirate Bay-medstiftere st\xe5r han ansigt til ansigt med et erstatningskrav fra Hollywood p\xe5 72 millioner kroner i en sag om kr\xe6nkelse af ophavsret. Fredrik er p\xe5 vej hen for at installere en ny computer i den hemmelige serverhal. Det er her verdens st\xf8rste fildelingsside er gemt. \nDa hacker-vidunderbarnet Gottfrid, internetaktivisten Peter og den fordrukne webn\xf8rd Fredrik findes skyldige i retssagen bliver de konfronteret med virkeligheden i form af et liv offline - v\xe6k fra tastaturet. Men dybt nede i de m\xf8rke datacentre forts\xe6tter skjulte computere stille med at kopiere filer.',
+    #                   u'Title': u'DR3 Dok: Pirate Bay indefra',
+    #                   u'AnnouncedEndTime': u'2013-04-04T00:35:00Z',
+    #                   u'FirstPartOid': 201217099813, u'Key':
+    #                   u'dr.dk/mas/whatson/201217099813@dr.dk/mas/whatson/channel/DR3',
+    #                   u'BroadcastDate': u'2013-04-03T00:00:00Z',
+    #                   u'VideoHD': True,
+    #                   u'ProductionYear': 2012,
+    #                   u'StartTime': u'2013-04-03T23:14:00.28Z',
+    #                   u'VideoWidescreen': True,
+    #                   u'AnnouncedStartTime': u'2013-04-03T23:15:00Z',
+    #                   u'WhatsOnUri': u'dr.dk/mas/whatson/201217099813',
+    #                   u'EndTime': u'2013-04-04T00:36:44.04Z',
+    #                   u'IsRerun': False,
+    #                   u'Channel': u'dr.dk/mas/whatson/channel/DR3',
+    #                   u'Punchline': u'Dansk dokumentar fra 2013.'
+    #               },
+    #               {
+    #                   u'ProductionCountry': u'DANMARK',
+    #                   u'TransmissionOid': 201940946812,
+    #                   u'Description': u'Det er dagen f\xf8r retssagen begynder. Fredrik pakker en computer i en rusten gammel Volvo. Sammen med hans Pirate Bay-medstiftere st\xe5r han ansigt til ansigt med et erstatningskrav fra Hollywood p\xe5 72 millioner kroner i en sag om kr\xe6nkelse af ophavsret. Fredrik er p\xe5 vej hen for at installere en ny computer i den hemmelige serverhal. Det er her verdens st\xf8rste fildelingsside er gemt. \nDa hacker-vidunderbarnet Gottfrid, internetaktivisten Peter og den fordrukne webn\xf8rd Fredrik findes skyldige i retssagen bliver de konfronteret med virkeligheden i form af et liv offline - v\xe6k fra tastaturet. Men dybt nede i de m\xf8rke datacentre forts\xe6tter skjulte computere stille med at kopiere filer.',
+    #                   u'Title': u'DR3 Dok: Pirate Bay indefra',
+    #                   u'AnnouncedEndTime': u'2013-04-11T15:45:00Z',
+    #                   u'FirstPartOid': 201940947813,
+    #                   u'Key': u'dr.dk/mas/whatson/201940947813@dr.dk/mas/whatson/channel/DR3',
+    #                   u'BroadcastDate': u'2013-04-11T00:00:00Z',
+    #                   u'VideoHD': True,
+    #                   u'ProductionYear': 2012,
+    #                   u'StartTime': u'2013-04-11T14:25:15Z',
+    #                   u'VideoWidescreen': True,
+    #                   u'AnnouncedStartTime': u'2013-04-11T14:25:00Z',
+    #                   u'WhatsOnUri': u'dr.dk/mas/whatson/201940947813',
+    #                   u'EndTime': u'2013-04-11T15:48:28.76Z',
+    #                   u'IsRerun': False,
+    #                   u'Channel': u'dr.dk/mas/whatson/channel/DR3',
+    #                   u'Punchline': u'Dansk dokumentar fra 2013.'
+    #               },
+    #               {
+    #                   u'ProductionCountry': u'DANMARK',
+    #                   u'TransmissionOid': 234677919812,
+    #                   u'Description': u'Det er dagen f\xf8r retssagen begynder. Fredrik pakker en computer i en rusten gammel Volvo. Sammen med hans Pirate Bay-medstiftere st\xe5r han ansigt til ansigt med et erstatningskrav fra Hollywood p\xe5 72 millioner kroner i en sag om kr\xe6nkelse af ophavsret. Fredrik er p\xe5 vej hen for at installere en ny computer i den hemmelige serverhal. Det er her verdens st\xf8rste fildelingsside er gemt. \nDa hacker-vidunderbarnet Gottfrid, internetaktivisten Peter og den fordrukne webn\xf8rd Fredrik findes skyldige i retssagen bliver de konfronteret med virkeligheden i form af et liv offline - v\xe6k fra tastaturet. Men dybt nede i de m\xf8rke datacentre forts\xe6tter skjulte computere stille med at kopiere filer.',
+    #                   u'Title': u'Pirate Bay indefra',
+    #                   u'AnnouncedEndTime': u'2013-12-31T12:40:00Z',
+    #                   u'FirstPartOid': 234677920813,
+    #                   u'Key': u'dr.dk/mas/whatson/234677920813@dr.dk/mas/whatson/channel/DR3',
+    #                   u'_ProductionTag': u'OV - on demand video (WEBCMS)',
+    #                   u'BroadcastDate': u'2013-12-31T00:00:00Z',
+    #                   u'VideoHD': True, u'ProductionYear': 2012,
+    #                   u'Channel': u'dr.dk/mas/whatson/channel/DR3',
+    #                   u'StartTime': u'2013-12-31T11:17:08.04Z',
+    #                   u'VideoWidescreen': True,
+    #                   u'AnnouncedStartTime': u'2013-12-31T11:15:00Z',
+    #                   u'WhatsOnUri': u'dr.dk/mas/whatson/234677920813',
+    #                   u'EndTime': u'2013-12-31T12:40:26.64Z',
+    #                   u'IsRerun': False,
+    #                   u'_SubtitleType': u'FOREIGN',
+    #                   u'Punchline': u'Dansk dokumentar fra 2013.'
+    #               }
+    #           ],
+    #           u'Version': 52,
+    #           u'CreatedTime': u'2013-02-13T05:32:50.043Z',
+    #           u'GenreCode': u'2:0',
+    #           u'_Gallery': u'/Resources/dr.dk/NETTV/DR3/',
+    #           u'Description': u'Det er dagen f\xf8r retssagen begynder. Fredrik pakker en computer i en rusten gammel Volvo. Sammen med hans Pirate Bay-medstiftere st\xe5r han ansigt til ansigt med et erstatningskrav fra Hollywood p\xe5 72 millioner kroner i en sag om kr\xe6nkelse af ophavsret. Fredrik er p\xe5 vej hen for at installere en ny computer i den hemmelige serverhal. Det er her verdens st\xf8rste fildelingsside er gemt. \nDa hacker-vidunderbarnet Gottfrid, internetaktivisten Peter og den fordrukne webn\xf8rd Fredrik findes skyldige i retssagen bliver de konfronteret med virkeligheden i form af et liv offline - v\xe6k fra tastaturet. Men dybt nede i de m\xf8rke datacentre forts\xe6tter skjulte computere stille med at kopiere filer.', u'OnlineGenreText': u'Dokumentar', u'PrimaryBroadcastWhatsOnUri': u'dr.dk/mas/whatson/234677920813', u'Relations': [{u'BundleType': u'Series', u'Kind': u'MemberOf', u'Urn': u'urn:dr:mu:bundle:4f3b98a2860d9a33ccfdd571', u'Slug': u'dokumania'}], u'ProductionYear': 2012, u'_PostingGuid': u'{e7e55b32-300a-4504-a864-5e107b9cddc4}', u'ChannelType': u'TV', u'PrimaryAssetStartPublish': u'2013-12-31T11:17:05Z', u'Slug': u'dokumania-pirate-bay-indefra', u'ProductionCountry': u'DANMARK', u'EndPublish': u'9999-12-31T22:59:59Z', u'_ResourceId': 1667922, u'Assets': [{u'Kind': u'VideoResource', u'StartPublish': u'2013-12-31T11:17:05Z', u'EndPublish': u'2014-01-30T11:17:05Z', u'Uri': u'http://www.dr.dk/mu/bar/52c2a60ca11f9d19dccc9234', u'RestrictedToDenmark': True, u'DurationInMilliseconds': 4917000, u'Trashed': False}, {u'Kind': u'Image', u'ContentType': u'image/jpeg', u'Name': u'piratebay.jpg', u'StartPublish': u'2013-12-31T16:45:01.233Z', u'EndPublish': u'9999-12-31T22:59:59Z', u'Uri': u'http://www.dr.dk/mu/bar/52c2f4936187a21b604b0103', u'Id': u'hpvdzpwx', u'Size': 161586}, {u'Kind': u'Image', u'ContentType': u'image/jpeg', u'Name': u'pirate Bay indefra.jpg', u'StartPublish': u'2013-02-27T08:57:26.999Z', u'EndPublish': u'9999-12-31T22:59:59Z', u'Uri': u'http://www.dr.dk/mu/Bar/512dca82860d9a3104d68d4a', u'Id': u'hdo93wjc', u'Trashed': False, u'Size': 75644}, {u'StartPublish': u'0001-01-01T00:00:00Z', u'Kind': u'Image', u'EndPublish': u'9999-12-31T22:59:59.999Z', u'Uri': u'http://www.dr.dk/mu/bar/52c2a611a11f9d19dccc9235', u'Trashed': False}], u'StartPublish': u'0001-01-01T00:00:00Z', u'Urn': u'urn:dr:mu:programcard:511b2582860d9a17f019f795',
+    #           u'ModifiedBy': u'NET\\MPAG',
+    #           u'Dirty': True,
+    #           u'PrimaryBroadcastStartTime': u'2013-12-31T11:15:00Z',
+    #           u'PrimaryAssetUri': u'http://www.dr.dk/mu/bar/52c2a60ca11f9d19dccc9234',
+    #           u'PrimaryAssetEndPublish': u'2014-01-30T11:17:05Z',
+    #           u'PrimaryBroadcastDirty': False,
+    #           u'Subtitle': u'Dansk dokumentar fra 2013.',
+    #           u'RtmpHost': u'rtmp://vod-prio3.gss.dr.dk',
+    #           u'PrimaryChannel': u'dr.dk/mas/whatson/channel/DR2',
+    #           u'PrimaryBroadcastChannel': u'dr.dk/mas/whatson/channel/DR3',
+    #           u'PresentationUri': u'http://www.dr.dk/tv/se/dokumania/dokumania-pirate-bay-indefra',
+    #           u'CardType': u'Program',
+    #           u'PrimaryAssetKind': u'VideoResource',
+    #           u'CreatedBy': u'Application@MU01',
+    #           u'GenreText': u'Dokumentar'
+    #       }
+    #   ],
+    #   u'ResultGenerated': u'2014-01-04T23:24:02.2649194Z', u'ResultProcessingTime': 1}
 
     description = meta['Data'][0]['Description']
     aired = parser.parse(meta['Data'][0]['PrimaryBroadcastStartTime'])
 
     return VideoClipObject(
-                title = item['title'],
-                summary = description,
-                originally_available_at = aired,
-                thumb = Resource.ContentsOfURLWithFallback(thumb,R('icon-movie.png')),
-                url = url)
+                title=item['title'],
+                summary=description,
+                originally_available_at=aired,
+                thumb=Resource.ContentsOfURLWithFallback(thumb,R('icon-movie.png')),
+                url=url)
 
