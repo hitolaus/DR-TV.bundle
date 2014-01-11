@@ -46,7 +46,6 @@ def MainMenu():
     oc.add(DirectoryObject(key=Callback(MostViewedList), title=L('Most Viewed Menu Title'), thumb = R('icon-popular.png')))
     oc.add(DirectoryObject(key=Callback(PremiereList), title=L('Premiere Menu Title'), thumb = R('icon-bookmark.png')))
     oc.add(DirectoryObject(key=Callback(NewestList), title=L('Newest Menu Title'), thumb = R('icon-flaged.png')))
-    oc.add(DirectoryObject(key=Callback(LastChanceList), title=L('Last Chance Menu Title'), thumb = R('icon-last.png')))
     oc.add(DirectoryObject(key=Callback(GenresList), title=L('Genre Menu Title'), thumb = R('icon-starred.png')))
     oc.add(DirectoryObject(key=Callback(AlphabeticallyList), title=L('A-Z Menu Title'), thumb = R('icon-menu.png')))
 
@@ -111,9 +110,6 @@ def HighlightList():
 def NewestList():
     return BrowseVideos(API_MOBILE_BASE_URL + '/newest')
 
-def LastChanceList():
-    return BrowseVideos(API_MOBILE_BASE_URL + '/lastchance')
-
 def PremiereList():
     return BrowseVideos(API_MOBILE_BASE_URL + '/premiere')
 
@@ -146,37 +142,67 @@ def GenresList():
     return oc
 
 
+# string.lowercase isn't supported
+def getAllTheLetters(begin='A', end='Z'):
+    letters = []
+
+    beginNum = ord(begin)
+    endNum = ord(end)
+    for number in xrange(beginNum, endNum+1):
+        letters.append(chr(number))
+
+    return letters;
+
+
 def AlphabeticallyList():
     oc = ObjectContainer()
 
+    for i in getAllTheLetters():
+        oc.add(DirectoryObject(key = Callback(BrowseAlphabet, letter = i), title = i))
+
     #Do a search - http://www.dr.dk/tv/api/programmap?&searchType=startswith&title=&genre=&channelSlug=&includePreviews=false&orderByDate=true&limit=24&offset=24
 
-    for item in HTML.ElementFromURL('http://www.dr.dk/nu-mobil/home/alphabetical').xpath('//li'):
-        #http://www.dr.dk/nu-mobil/api/programserie?label=
-        internal_link = item.xpath('.//a')[0].get('href')
+#     for item in HTML.ElementFromURL('http://www.dr.dk/nu-mobil/home/alphabetical').xpath('//li'):
+#         #http://www.dr.dk/nu-mobil/api/programserie?label=
+#         internal_link = item.xpath('.//a')[0].get('href')
 
-        slug = internal_link[internal_link.rindex("/")+1:]
+#         slug = internal_link[internal_link.rindex("/")+1:]
 
-        thumb = API_BASE_URL+'/programseries/'+slug+'/images/'+THUMB_WIDTH+'x'+THUMB_HEIGHT+'.jpg'
-        url = API_MOBILE_BASE_URL +'/programserie?slug='+ slug
+#         thumb = API_BASE_URL+'/programseries/'+slug+'/images/'+THUMB_WIDTH+'x'+THUMB_HEIGHT+'.jpg'
+#         url = API_MOBILE_BASE_URL +'/programserie?slug='+ slug
 
-        title = item.xpath('.//a/text()')[0]
+#         title = item.xpath('.//a/text()')[0]
 
-        title_pattern = Regex('(.*)\(([0-9]+)\)')
-        m = title_pattern.search(title)
-        episode_count = int(m.group(2))
+#         title_pattern = Regex('(.*)\(([0-9]+)\)')
+#         m = title_pattern.search(title)
+#         episode_count = int(m.group(2))
 
-        title = m.group(1).strip()
+#         title = m.group(1).strip()
 
-#        oc.add(DirectoryObject(key = Callback(BrowseProgram, url = url),
-#                            title = title,
-#                            thumb = Resource.ContentsOfURLWithFallback(thumb,'icon-default.png')))
-        oc.add(TVShowObject(key = Callback(BrowseProgram, url = url),
-                            rating_key = slug,
-                            title = title,
-                            episode_count = episode_count,
-                            thumb = Resource.ContentsOfURLWithFallback(thumb,'icon-default.png')))
+# #        oc.add(DirectoryObject(key = Callback(BrowseProgram, url = url),
+# #                            title = title,
+# #                            thumb = Resource.ContentsOfURLWithFallback(thumb,'icon-default.png')))
+#         oc.add(TVShowObject(key = Callback(BrowseProgram, url = url),
+#                             rating_key = slug,
+#                             title = title,
+#                             episode_count = episode_count,
+#                             thumb = Resource.ContentsOfURLWithFallback(thumb,'icon-default.png')))
 
+
+    return oc
+
+def BrowseAlphabet(letter):
+    url = 'http://www.dr.dk/tv/api/programmap?&searchType=startswith&title=%s&genre=&channelSlug=&includePreviews=false&orderByDate=false&limit=100&offset=0' % letter
+
+    oc = ObjectContainer()
+
+    for item in JSON.ObjectFromURL(url)['ProgramSeries']:
+
+        url = API_MOBILE_BASE_URL +'/programserie?slug='+ item['ProgramSeriesSlug']
+
+        #oc.add(BrowseProgram(url))
+
+        oc.add(DirectoryObject(key=Callback(BrowseProgram, url=url), title=item['Title'], thumb=item['Image']))
 
     return oc
 
@@ -369,7 +395,7 @@ def GetVideoClip(item):
     #   u'ResultGenerated': u'2014-01-04T23:24:02.2649194Z', u'ResultProcessingTime': 1}
 
     description = meta['Data'][0]['Description']
-    aired = parser.parse(meta['Data'][0]['PrimaryBroadcastStartTime'])
+    aired = parser.parse(meta['Data'][0].get('PrimaryBroadcastStartTime', '1970-01-01T01:00:00Z'))
 
     return VideoClipObject(
                 title=item['title'],
