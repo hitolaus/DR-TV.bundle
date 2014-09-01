@@ -15,8 +15,6 @@ API_MOBILE_BASE_URL = 'http://www.dr.dk/nu-mobil/api'
 API_BASE_URL = 'http://www.dr.dk/nu/api'
 API_META_URL = 'http://www.dr.dk/mu/programcard'
 
-LIVE_URL_BASE = 'http://lm.gss.dr.dk/V/V%sH.stream/Playlist.m3u8'
-
 THUMB_WIDTH = '300'
 THUMB_HEIGHT = '160'
 
@@ -70,32 +68,32 @@ def LiveTvList():
     oc = ObjectContainer()
 
     oc.add(VideoClipObject(
-                    url = LIVE_URL_BASE % '01',
+                    url = 'http://dr01-lh.akamaihd.net/i/dr01_0@147054/master.m3u8',
                     title = dr1.get('Title', 'DR1'),
                     summary = dr1.get('Description'),
                     thumb = R('icon-channel-dr1.png')))
     oc.add(VideoClipObject(
-                    url = LIVE_URL_BASE % '02',
+                    url = 'http://dr02-lh.akamaihd.net/i/dr02_0@147055/master.m3u8',
                     title = dr2.get('Title', 'DR2'),
                     summary = dr2.get('Description'),
                     thumb = R('icon-channel-dr2.png')))
     oc.add(VideoClipObject(
-                    url = LIVE_URL_BASE % '06',
+                    url = 'http://dr03-lh.akamaihd.net/i/dr03_0@147056/master.m3u8',
                     title = dr3.get('Title', 'DR3'),
                     summary = dr3.get('Description'),
                     thumb = R('icon-channel-dr3.png')))
     oc.add(VideoClipObject(
-                    url = LIVE_URL_BASE % '05',
+                    url = 'http://dr04-lh.akamaihd.net/i/dr04_0@147057/master.m3u8',
                     title = ramasjang.get('Title', 'DR Ramasjang'),
                     summary = ramasjang.get('Description'),
                     thumb = R('icon-channel-ramasjang.png')))
     oc.add(VideoClipObject(
-                    url = LIVE_URL_BASE % '04',
+                    url = 'http://dr05-lh.akamaihd.net/i/dr05_0@147058/master.m3u8',
                     title = drk.get('Title', 'DR K'),
                     summary = drk.get('Description'),
                     thumb = R('icon-channel-drk.png')))
     oc.add(VideoClipObject(
-                    url = LIVE_URL_BASE % '03',
+                    url = 'http://dr06-lh.akamaihd.net/i/dr06_0@147059/master.m3u8',
                     title = ultra.get('Title', 'DR Ultra'),
                     summary = ultra.get('Description'),
                     thumb = R('icon-channel-ultra.png')))

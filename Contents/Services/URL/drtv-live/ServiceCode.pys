@@ -1,10 +1,34 @@
 ####################################################################################################
 def MetadataObjectForURL(url):
+    if 'dr01' in url:
+      slug = 'dr1'
+      thumb = R('icon-channel-dr1.png')
+    elif 'dr02' in url:
+      slug = 'dr2'
+      thumb = R('icon-channel-dr2.png')
+    elif 'dr03' in url:
+      slug = 'dr3'
+      thumb = R('icon-channel-dr3.png')
+    elif 'dr04' in url:
+      slug = 'dr-ramasjang'
+      thumb =  R('icon-channel-ramasjang.png')
+    elif 'dr05' in url:
+      slug = 'dr-k'
+      thumb = R('icon-channel-drk.png')
+    elif 'dr06' in url:
+      slug = 'dr-ultra'
+      thumb = R('icon-channel-ultra.png')
+    else:
+      slug = 'dr1'
+      thumb = R('icon-default.png')
+
+    now = JSON.ObjectFromURL('http://www.dr.dk/TV/api/live/info/'+slug+'/json').get('Now')
 
     return VideoClipObject(
-        title = 'title',
-        summary = 'description',
-        thumb = R('icon-default.png'))
+        title = now.get('Title', ''),
+        summary = now.get('Description', ''),
+        thumb = thumb)
+
 
 ####################################################################################################
 def MediaObjectsForURL(url):
@@ -22,7 +46,7 @@ def MediaObjectsForURL(url):
 def PlayVideo(url, platform):
     original_url = url
     original_playlist = HTTP.Request(url).content
-    
+
     url = url[:url.rindex("/")]
 
     new_playlist = RegeneratePlaylist(original_playlist.splitlines(), url)
@@ -40,7 +64,7 @@ def RegeneratePlaylist(playlist, url):
             new_playlist = new_playlist + url + '/' + line
         else:
             new_playlist = new_playlist + line
-    
+
         new_playlist = new_playlist + '\n'
 
     return new_playlist

@@ -19,11 +19,11 @@
 		<dict>
 			<key>TestURLs</key>
 			<array>
-				<string>http://lm.gss.dr.dk/V/01L.stream/Playlist.m3u8</string>
+				<string>http://dr02-lh.akamaihd.net/i/dr02_0@147055/master.m3u8</string>
 			</array>
 			<key>URLPatterns</key>
 			<array>
-				<string>http://lm.gss.dr.dk/V/.*</string>
+				<string>http://dr.*-lh.akamaihd.net/i/dr.*@.*/master.m3u8</string>
 			</array>
 		</dict>
 	</dict>
