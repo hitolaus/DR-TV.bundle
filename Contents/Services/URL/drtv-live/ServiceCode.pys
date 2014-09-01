@@ -9,10 +9,10 @@ def MetadataObjectForURL(url):
     elif 'dr03' in url:
       slug = 'dr3'
       thumb = R('icon-channel-dr3.png')
-    elif 'dr04' in url:
+    elif 'dr05' in url:
       slug = 'dr-ramasjang'
       thumb =  R('icon-channel-ramasjang.png')
-    elif 'dr05' in url:
+    elif 'dr04' in url:
       slug = 'dr-k'
       thumb = R('icon-channel-drk.png')
     elif 'dr06' in url:

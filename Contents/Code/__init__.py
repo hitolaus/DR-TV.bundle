@@ -83,12 +83,12 @@ def LiveTvList():
                     summary = dr3.get('Description'),
                     thumb = R('icon-channel-dr3.png')))
     oc.add(VideoClipObject(
-                    url = 'http://dr04-lh.akamaihd.net/i/dr04_0@147057/master.m3u8',
+                    url = 'http://dr05-lh.akamaihd.net/i/dr05_0@147058/master.m3u8',
                     title = ramasjang.get('Title', 'DR Ramasjang'),
                     summary = ramasjang.get('Description'),
                     thumb = R('icon-channel-ramasjang.png')))
     oc.add(VideoClipObject(
-                    url = 'http://dr05-lh.akamaihd.net/i/dr05_0@147058/master.m3u8',
+                    url = 'http://dr04-lh.akamaihd.net/i/dr04_0@147057/master.m3u8',
                     title = drk.get('Title', 'DR K'),
                     summary = drk.get('Description'),
                     thumb = R('icon-channel-drk.png')))
